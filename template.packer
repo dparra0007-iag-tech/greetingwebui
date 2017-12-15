@@ -1,0 +1,31 @@
+{
+	"builders": [
+		{
+			"type": "amazon-ebs",
+			"region": "us-west-2",
+			"access_key": "AKIAIMQDKEE5AUFSXKZA",
+			"secret_key": "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",
+			"source_ami": "ami-c80444df",
+			"instance_type": "t2.micro",
+			"ssh_username": "ubuntu",
+			"ami_name": "MiddleTier-{{isotime | clean_ami_name}}",
+			"ami_description": "Ubuntu AMI For Jokeservice",
+			"tags": {
+				"role": "MiddleTier"
+			},
+			"run_tags": {
+				"role": "buildSystem"
+			}
+		}
+	],
+    "provisioners": [
+		{
+			"type": "shell",
+			"script": "ansible.sh"
+		},
+		{
+			"type": "ansible-local",
+			"playbook_file": "./deploy/deploy.yml"
+		}
+    ]
+}
