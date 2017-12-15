@@ -3,8 +3,8 @@
 		{
 			"type": "amazon-ebs",
 			"region": "us-west-2",
-			"access_key": "AKIAIMQDKEE5AUFSXKZA",
-			"secret_key": "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",
+			"access_key": "AKIAJ5UZSNJT5PHTI5AA",
+			"secret_key": "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",
 			"source_ami": "ami-c80444df",
 			"instance_type": "t2.micro",
 			"ssh_username": "ubuntu",
