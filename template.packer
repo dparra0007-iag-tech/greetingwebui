@@ -2,7 +2,7 @@
 	"builders": [
 		{
 			"type": "amazon-ebs",
-			"region": "us-west-2",
+			"region": "us-east-1",
 			"access_key": "AKIAJ5UZSNJT5PHTI5AA",
 			"secret_key": "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",
 			"source_ami": "ami-c80444df",
@@ -21,7 +21,7 @@
     "provisioners": [
 		{
 			"type": "shell",
-			"script": "ansible.sh"
+			"script": "./deploy/ansible.sh"
 		},
 		{
 			"type": "ansible-local",
