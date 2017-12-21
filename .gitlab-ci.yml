@@ -56,7 +56,8 @@ build_code:
 
 build_service:
   stage: build image
-  image: hashicorp/packer:1.1.3
+  services:
+    - hashicorp/packer:1.1.3
   script:
     - packer build ./gofrontend/template.packer
   dependencies:
