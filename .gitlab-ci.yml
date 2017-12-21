@@ -1,0 +1,172 @@
+image: dparra0007/docker:451
+
+services:
+  - name: dparra0007/docker-dind:421
+    alias: docker
+
+stages:
+- build code
+- test code
+- build image
+- test image
+- deploy
+
+#variables:
+#  CONTAINER_SERVICE_IMAGE: dparra0007/todoapi
+#  CONTAINER_MESSAGEBROKER_IMAGE: dparra0007/todoapi-messagebroker
+#  CONTAINER_APIGATEWAY_IMAGE: dparra0007/todoapi-apigateway
+#  CONTAINER_DISCOVERY_IMAGE: dparra0007/todoapi-discovery
+
+build_code:
+  stage: build code
+  image: golang:1.8
+  services:
+    - name: dparra0007/docker-dind:421
+      alias: docker
+  script:
+    - env GOOS=linux GOARCH=amd64 go build -o ./gofrontend/ToUpload/app app.go
+  artifacts:
+    paths:
+      - ./gofrontend/ToUpload/*
+      - ./gofrontend/Scripts/*
+  except:
+    - triggers
+
+#unit_integration_test_code:
+#  stage: test code
+#  image: microsoft/aspnetcore-build:1.1
+#  script:
+#    - dotnet restore ./todoapi/todoapi.unittest
+#    - dotnet test ./todoapi/todoapi.unittest/todoapi.unittest.csproj
+#  except:
+#    - triggers
+
+#static_test_service:
+#  stage: test code
+#  script:
+#    - docker run --rm -v $(pwd):/data -w /data dparra0007/sonar-scanner:20171010-1 sonar-scanner
+#     -Dsonar.projectKey=$CI_PROJECT_NAMESPACE:$CI_PROJECT_NAME 
+#     -Dsonar.projectName=$CI_PROJECT_NAME 
+#     -Dsonar.branch=$CI_COMMIT_REF_NAME 
+#     -Dsonar.projectVersion=$CI_JOB_ID 
+#     -Dsonar.sources=./greetingapi/src 
+#     -Dsonar.java.binaries=./greetingapi/target 
+#     -Dsonar.gitlab.project_id=$CI_PROJECT_ID 
+#     -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA 
+#     -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+#  except:
+#    - triggers
+
+#build_service:
+#  stage: build image
+#  script:
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+#    - docker build -t registry.gitlab.com/w53/w53-todoapi/todoapi ./todoapi/todoapi
+#    - docker tag registry.gitlab.com/w53/w53-todoapi/todoapi registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME
+#    - docker push registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME
+#  dependencies:
+#    - build_service_dotnet
+#  except:
+#    - triggers
+
+#functional_test_service:
+#  stage: test docker
+#  before_script:
+#    - apk update
+#    - apk upgrade
+#    - apk add python python-dev py-pip build-base
+#    - curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+#    - chmod +x /usr/local/bin/docker-compose
+#    - pip install docker-compose
+#  script:
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+#    - export TAG=$CI_COMMIT_REF_NAME 
+#    - docker-compose -f docker-compose.functional.test.yml up -d
+#    - sleep 10s
+#    - docker logs $(docker ps -a --filter ancestor=dparra0007/newman:20170712-4 --format "{{.ID}}")
+#  after_script:
+#    - docker stop $(docker ps -a --filter status=running --format "{{.ID}}") > /dev/null
+#    - docker rm $(docker ps -a -q) -f > /dev/null
+#    - docker rmi $(docker images -q) -f > /dev/null || true
+#  when: manual
+#  only:
+#    - master
+#  except:
+#    - triggers
+
+#performance_test_service:
+#  stage: test docker
+#  before_script:
+#    - apk update
+#    - apk upgrade
+#    - apk add python python-dev py-pip build-base
+#    - curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+#    - chmod +x /usr/local/bin/docker-compose
+#    - pip install docker-compose
+#  script:
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+#    - export TAG=$CI_COMMIT_REF_NAME 
+#    - docker-compose -f docker-compose.performance.test.yml up -d
+#    - sleep 90s
+#    - docker logs $(docker ps -a --filter ancestor=buildpack-deps:curl --format "{{.ID}}")
+#  after_script:
+#    - docker stop $(docker ps -a --filter status=running --format "{{.ID}}") > /dev/null
+#    - docker rm $(docker ps -a -q) -f > /dev/null
+#    - docker rmi $(docker images -q) -f > /dev/null || true
+#  when: manual
+#  only:
+#    - master
+#  except:
+#    - triggers
+
+#capacity_test_service:
+#  stage: test docker
+#  image: microsoft/aspnetcore-build:1.1
+#  script:
+#    - echo "Deploy to capacity testing env and execute automatic testing"
+#  - /usr/local/bin/oc login ${OC_URL} --token=${OC_TOKEN}
+#  - /usr/local/bin/oc project todoapi || /usr/local/bin/oc new-project todoapi
+#  when: manual
+#  only:
+#    - master
+#  except:
+#    - triggers
+
+#deploy_staging:
+#  stage: deploy
+#  image: dparra0007/docker:448
+#  variables:
+#    IMG_BLD: "registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME"
+#    PATH_DFILE: "./todoapi/todoapi/Dockerfile"
+#  script:
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+#    - docker pull registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME
+#    - docker exec anchore anchore analyze --image registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME
+#    - docker exec anchore anchore gate --image registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME
+#    - docker tag registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME $CONTAINER_SERVICE_IMAGE
+#    - docker tag registry.gitlab.com/w53/w53-todoapi/todoapi:$CI_COMMIT_REF_NAME $CONTAINER_SERVICE_IMAGE:$CI_PIPELINE_ID-$CI_JOB_ID
+#    - docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASS https://index.docker.io/v1/
+#    - docker push $CONTAINER_SERVICE_IMAGE
+#    - docker push $CONTAINER_SERVICE_IMAGE:$CI_PIPELINE_ID-$CI_JOB_ID
+#  environment:
+#    name: staging
+#  only:
+#    - master
+
+#deploy_prod:
+#  stage: deploy
+#  image: appropriate/curl
+#  script:
+#    - echo "Deploy to production server"
+#    - curl -X POST https://cloud.docker.com/api/app/v1/service/5439504f-7008-4b08-9f55-10932dd9b205/trigger/9e7c6483-cc64-4554-b7ce-5ede1529a374/call/
+#    - curl -X POST https://cloud.docker.com/api/app/v1/service/0770275d-50fe-438d-bc09-21f7d31a40d2/trigger/88d89f02-973e-4e84-8c59-8018d05a795d/call/
+#    - curl -X POST https://cloud.docker.com/api/app/v1/service/7a76e002-dc20-4ba4-8641-d2427167097a/trigger/285b9c3b-53c8-4fbc-bd4a-7a6c00ce4872/call/
+#    - curl -X POST https://cloud.docker.com/api/app/v1/service/3a995e5c-bbd0-4625-b5d7-f07257803276/trigger/2d702465-1a07-4bb6-8212-9ae1e5b67b19/call/
+#  environment:
+#    name: production
+#    url: http://todoapi-apigateway.w53-todoapi.3a995e5c.svc.dockerapp.io:8080/todoapi/swagger.json
+#  when: manual
+#  only:
+#    - master
+#  except:
+#    - triggers
