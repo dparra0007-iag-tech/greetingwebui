@@ -4,12 +4,12 @@
 		"supervisor_version": "3.0b2-1",
 		"auth_header": "{{env `AUTH_HEADER`}}",
 		"access_key": "AKIAJ5UZSNJT5PHTI5AA",
-		"secret_key": "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",
+		"secret_key": "59kHk2IOvehWIkGUpI3M+mQgoktqgpy3hqI/f6Kp"
 	},
 	"builders": [
 		{
 			"type": "amazon-ebs",
-			"region": "us-east-1",
+			"region": "us-west-2",
 			"source_ami": "{{user `ami_id`}}",
 			"access_key": "{{user `access_key`}}",
 			"secret_key": "{{user `secret_key`}}",

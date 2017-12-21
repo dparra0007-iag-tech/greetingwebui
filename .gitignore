@@ -6,3 +6,4 @@ node_modules/
 .idea
 .sass-cache
 Thumbs.db
+*.pem
