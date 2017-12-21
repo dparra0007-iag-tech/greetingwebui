@@ -26,6 +26,7 @@ build_code:
     paths:
       - ./gofrontend/ToUpload/*
       - ./gofrontend/Scripts/*
+      - ./gofrontend/ansible/*
   except:
     - triggers
 
