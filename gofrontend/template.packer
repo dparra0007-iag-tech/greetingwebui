@@ -28,7 +28,7 @@
 	"provisioners": [
 		{
 			"type": "shell",
-			"script": "ansible.sh"
+			"script": "./ansible.sh"
 		},
 		{
 			"type": "ansible-local",
