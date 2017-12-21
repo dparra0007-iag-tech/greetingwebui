@@ -24,7 +24,7 @@ build_code:
     - name: dparra0007/docker-dind:421
       alias: docker
   script:
-    - env GOOS=linux GOARCH=amd64 go build -o ./gofrontend/ToUpload/app app.go
+    - env GOOS=linux GOARCH=amd64 go build -o ./gofrontend/ToUpload/app ./gofrontend/app.go
   artifacts:
     paths:
       - ./gofrontend/ToUpload/*
