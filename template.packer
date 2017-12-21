@@ -15,10 +15,10 @@
 			"secret_key": "{{user `secret_key`}}",
 			"instance_type": "t2.micro",
 			"ssh_username": "ubuntu",
-			"ami_name": "MiddleTier-{{isotime | clean_ami_name}}",
-			"ami_description": "MiddleTier Service",
+			"ami_name": "FrontEndTier-{{isotime | clean_ami_name}}",
+			"ami_description": "Go Front End",
 			"tags": {
-				"role": "MiddleTier"
+				"role": "FrontEndTier"
 			},
 			"run_tags": {
 				"role": "buildSystem"
