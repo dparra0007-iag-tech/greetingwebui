@@ -1,15 +1,22 @@
 {
+	"variables": {
+		"ami_id": "ami-9abea4fb",
+		"supervisor_version": "3.0b2-1",
+		"auth_header": "{{env `AUTH_HEADER`}}",
+		"access_key": "AKIAJ5UZSNJT5PHTI5AA",
+		"secret_key": "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",
+	},
 	"builders": [
 		{
 			"type": "amazon-ebs",
 			"region": "us-east-1",
-			"access_key": "AKIAJ5UZSNJT5PHTI5AA",
-			"secret_key": "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",
-			"source_ami": "ami-c80444df",
+			"source_ami": "{{user `ami_id`}}",
+			"access_key": "{{user `access_key`}}",
+			"secret_key": "{{user `secret_key`}}",
 			"instance_type": "t2.micro",
 			"ssh_username": "ubuntu",
 			"ami_name": "MiddleTier-{{isotime | clean_ami_name}}",
-			"ami_description": "Ubuntu AMI For Jokeservice",
+			"ami_description": "MiddleTier Service",
 			"tags": {
 				"role": "MiddleTier"
 			},
@@ -18,14 +25,37 @@
 			}
 		}
 	],
-    "provisioners": [
+	"provisioners": [
 		{
 			"type": "shell",
-			"script": "./deploy/ansible.sh"
+			"script": "ansible.sh"
 		},
 		{
 			"type": "ansible-local",
-			"playbook_file": "./deploy/deploy.yml"
+			"playbook_file": "./playbook.yml"
+		},
+		{
+			"type": "file",
+			"source": "ToUpload/",
+			"destination": "/tmp"
+		},
+		{
+			"type": "shell",
+			"script": "Scripts/nginx.sh",
+			"environment_vars": [
+				"AUTH_HEADER={{user `auth_header`}}"
+			]
+		},
+		{
+			"type": "shell",
+			"inline": [
+				"echo '**** Configuring application'",
+				"sudo apt-get install -y supervisor={{user `supervisor_version`}}",
+				"sudo cp /tmp/app-supervisor.conf /etc/supervisor/conf.d",
+				"sudo cp /tmp/app /usr/local/bin/app",
+				"sudo supervisorctl reread",
+				"sudo supervisorctl update"
+			]
 		}
-    ]
+	]
 }
