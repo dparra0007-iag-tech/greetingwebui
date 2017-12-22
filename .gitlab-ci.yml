@@ -22,9 +22,9 @@ build_code:
   image: golang:1.8
   script:
     - env GOOS=linux GOARCH=amd64 go build -o ./gofrontend/ToUpload/app ./gofrontend/app.go
-#  artifacts:
-#    paths:
-#      - ./gofrontend/ToUpload/*
+  artifacts:
+    paths:
+      - ./gofrontend/ToUpload/app
 #      - ./gofrontend/Scripts/*
 #      - ./gofrontend/ansible/*
   except:
@@ -59,9 +59,6 @@ build_service:
   stage: build image
   image: dparra0007/packer:20171221-2
   script:
-    - ls -la
-    - ls -la ./gofrontend
-    - ls -la ./gofrontend/ansible
     - cd ./gofrontend
     - packer build template.packer
   dependencies:
