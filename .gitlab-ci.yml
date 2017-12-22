@@ -62,7 +62,8 @@ build_service:
     - ls -la
     - ls -la ./gofrontend
     - ls -la ./gofrontend/ansible
-    - packer build ./gofrontend/template.packer
+    - cd ./gofrontend
+    - packer build template.packer
   dependencies:
     - build_code
   except:
