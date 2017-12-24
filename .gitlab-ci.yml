@@ -60,7 +60,7 @@ build_service:
   image: dparra0007/packer:20171221-2
   script:
     - cd ./gofrontend
-    - packer build -var "version=$CI_COMMIT_REF_NAME" template.packer
+    - packer build -var "version=$CI_COMMIT_SHA" template.packer
   dependencies:
     - build_code
   except:
@@ -137,7 +137,7 @@ deploy_staging:
     - export AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}
     - export AWS_DEFAULT_REGION="us-west-2"
   script:
-    - aws ec2 describe-images --filters Name=tag-key,Values=role Name=tag-value,Values=$CI_COMMIT_REF_NAME --query 'Images[*].{ID:ImageId}'
+    - aws ec2 describe-images --filters Name=tag-key,Values=role Name=tag-value,Values=$CI_COMMIT_SHA --query 'Images[*].{ID:ImageId}'
     - aws cloudformation deploy --template-file ./aws.template --stack-name $CI_PIPELINE_ID-$CI_JOB_ID --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' 'AMI=ami-7002af08'
   environment:
     name: staging
