@@ -4,7 +4,8 @@
 		"supervisor_version": "3.0b2-1",
 		"auth_header": "{{env `AUTH_HEADER`}}",
 		"access_key": "AKIAJ5UZSNJT5PHTI5AA",
-		"secret_key": "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"
+		"secret_key": "59kHk2IOvehWIkGUpI3M+mQgoktqgpy3hqI/f6Kp",
+		"version": "1.0.0"
 	},
 	"builders": [
 		{
@@ -18,7 +19,7 @@
 			"ami_name": "FrontEndTier-{{isotime | clean_ami_name}}",
 			"ami_description": "Go Front End",
 			"tags": {
-				"role": "FrontEndTier"
+				"version": "{{user `version`}}"
 			},
 			"run_tags": {
 				"role": "buildSystem"

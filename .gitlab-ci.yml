@@ -60,7 +60,7 @@ build_service:
   image: dparra0007/packer:20171221-2
   script:
     - cd ./gofrontend
-    - packer build template.packer #parameter $CI_COMMIT_REF_NAME para crear tag role con value $CI_COMMIT_REF_NAME
+    - packer build -var 'version=$CI_COMMIT_REF_NAME' template.packer
   dependencies:
     - build_code
   except:
@@ -141,6 +141,7 @@ deploy_staging:
     - aws cloudformation deploy --template-file ./aws.template --stack-name $CI_PIPELINE_ID-$CI_JOB_ID --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' 'AMI=ami-7002af08'
   environment:
     name: staging
+  when: manual
   only:
     - master
 
