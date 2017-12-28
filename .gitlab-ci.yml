@@ -140,10 +140,7 @@ deploy_staging:
     - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
     - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://workspace-gitlab-ci/
     - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_COMMIT_SHA --query 'Images[*].{ID:ImageId}' --output text)"
-    - aws cloudformation update-stack
-     --stack-name $CI_PROJECT_NAME 
-     --template-url https://s3-us-west-2.amazonaws.com/workspace-gitlab-ci/aws-$CI_PIPELINE_ID-$CI_JOB_ID.template 
-     --parameters ParameterKey=InstanceType,ParameterValue=t2.micro ParameterKey=AMI,ParameterValue=$AMI | aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
+    - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
   environment:
     name: staging
   when: manual
