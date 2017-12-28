@@ -143,7 +143,7 @@ deploy_staging:
     - aws cloudformation update-stack
      --stack-name $CI_PROJECT_NAME 
      --template-url https://s3-us-west-2.amazonaws.com/workspace-gitlab-ci/aws-$CI_PIPELINE_ID-$CI_JOB_ID.template 
-     --parameters ParameterKey=InstanceType,ParameterValue=t2.micro ParameterKey=AMI,ParameterValue=$AMI | aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' 'AMI=$AMI'
+     --parameters ParameterKey=InstanceType,ParameterValue=t2.micro ParameterKey=AMI,ParameterValue=$AMI | aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
   environment:
     name: staging
   when: manual
