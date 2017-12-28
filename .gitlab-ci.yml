@@ -138,7 +138,7 @@ deploy_staging:
     - export AWS_DEFAULT_REGION="us-west-2"
   script:
     - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
-    - aws s3 ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://workspace-gitlab-ci/
+    - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://workspace-gitlab-ci/
     - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_COMMIT_SHA --query 'Images[*].{ID:ImageId}' --output text)"
     - aws cloudformation update-stack
      --stack-name $CI_PROJECT_NAME 
