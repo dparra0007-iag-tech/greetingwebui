@@ -60,7 +60,10 @@ build_service:
   image: dparra0007/packer:20171221-2
   script:
     - cd ./gofrontend
-    - packer build -var "version=$CI_COMMIT_SHA" template.packer
+    - packer build
+     -var "version=$CI_COMMIT_SHA" 
+     -var "access_key=${AWS_CREDENTIAL_ACCESS_KEY_ID}" 
+     -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" template.packer
   dependencies:
     - build_code
   except:

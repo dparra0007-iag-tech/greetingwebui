@@ -3,8 +3,8 @@
 		"ami_id": "ami-9abea4fb",
 		"supervisor_version": "3.0b2-1",
 		"auth_header": "{{env `AUTH_HEADER`}}",
-		"access_key": "AKIAJ5UZSNJT5PHTI5AA",
-		"secret_key": "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",
+		"access_key": "access_key",
+		"secret_key": "secret_key",
 		"version": "1.0.0"
 	},
 	"builders": [
