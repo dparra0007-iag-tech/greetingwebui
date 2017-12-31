@@ -102,5 +102,17 @@
 				"sudo supervisorctl update"
 			]
 		}
+	],
+	"post-processors": [
+		{
+			"type": "compress",
+			"output": "FrontEnd.tar.gz",
+			"only": ["virtualbox-iso"]
+		},
+		{
+			"type": "vagrant",
+			"output": "{{.Provider}}-FrontEnd.box",
+			"only": ["virtualbox-iso"]
+		}
 	]
 }
