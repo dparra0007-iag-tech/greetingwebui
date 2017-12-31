@@ -27,8 +27,8 @@ build_code:
       - ./gofrontend/ToUpload/app
 #      - ./gofrontend/Scripts/*
 #      - ./gofrontend/ansible/*
-  except:
-    - triggers
+  only:
+    - master
 
 #unit_integration_test_code:
 #  stage: test code
@@ -66,8 +66,8 @@ build_service:
      -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" template.packer
   dependencies:
     - build_code
-  except:
-    - triggers
+  only:
+    - master
 
 #functional_test_service:
 #  stage: test docker
