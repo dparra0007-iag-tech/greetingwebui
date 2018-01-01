@@ -58,7 +58,8 @@
           				"2"
         			]
       			],
-			"headless": "true"
+			"headless": "true",
+			"format": "ova"
 		}
 	],
 	"provisioners": [
@@ -113,6 +114,17 @@
 			"type": "vagrant",
 			"output": "{{.Provider}}-FrontEnd.box",
 			"only": ["virtualbox-iso"]
-		}
+		},
+		{
+			"type": "amazon-import",
+			"access_key": "{{user `access_key`}}",
+			"secret_key": "{{user `secret_key`}}",
+			"region": "us-west-2",
+			"s3_bucket_name": "workspace-gitlab-ci",
+			"license_type": "BYOL",
+			"tags": {
+				"version": "{{user `version`}}"
+        }
+    }
 	]
 }
