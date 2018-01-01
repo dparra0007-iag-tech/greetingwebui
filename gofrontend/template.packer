@@ -34,16 +34,16 @@
          			"<enter><wait>"
       			],
 			"boot_wait": "10s",
-      			"iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04.4-server-amd64.iso",
+      			"iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04.5-server-amd64.iso",
       			"iso_checksum_type": "md5",
-      			"iso_checksum": "2ac1f3e0de626e54d05065d6f549fa3a",
+      			"iso_checksum": "dd54dc8cfc2a655053d19813c2f9aa9f",
 			"guest_os_type": "Ubuntu_64",
 			"http_directory": "http",
       			"ssh_username": "packer",
 		      	"ssh_password": "packer",
 			"ssh_wait_timeout": "10000s",
 			"shutdown_command": "sudo -S shutdown -P now",
-			"vm_name": "MiddleTier",
+			"vm_name": "FrontEnd",
 			"vboxmanage": [
         			[
           				"modifyvm",
