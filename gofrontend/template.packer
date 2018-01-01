@@ -34,7 +34,7 @@
          			"<enter><wait>"
       			],
 			"boot_wait": "10s",
-      			"iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04.5-server-amd64.iso",
+      			"iso_url": "https://s3-us-west-2.amazonaws.com/workspace-gitlab-ci/ubuntu-14.04.5-server-amd64.iso",
       			"iso_checksum_type": "md5",
       			"iso_checksum": "dd54dc8cfc2a655053d19813c2f9aa9f",
 			"guest_os_type": "Ubuntu_64",
