@@ -122,6 +122,8 @@
 			"region": "us-west-2",
 			"s3_bucket_name": "workspace-gitlab-ci",
 			"license_type": "BYOL",
+			"ami_name": "FrontEndTier-{{isotime | clean_ami_name}}",
+			"ami_description": "Go Front End",
 			"tags": {
 				"version": "{{user `version`}}"
         }
