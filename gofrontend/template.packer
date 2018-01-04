@@ -39,8 +39,8 @@
       			"iso_checksum": "dd54dc8cfc2a655053d19813c2f9aa9f",
 			"guest_os_type": "Ubuntu_64",
 			"http_directory": "http",
-      			"ssh_username": "packer",
-		      	"ssh_password": "packer",
+      			"ssh_username": "vagrant",
+		      	"ssh_password": "vagrant",
 			"ssh_wait_timeout": "10000s",
 			"shutdown_command": "sudo -S shutdown -P now",
 			"vm_name": "FrontEnd",
@@ -65,10 +65,7 @@
 	"provisioners": [
 		{
 			"type": "shell",
-			"scripts": [
-					"Scripts/virtualbox.sh",
-					"Scripts/vagrant.sh"
-			],
+			"scripts": "Scripts/virtualbox.sh",
 			"execute_command": "{{.Vars}} sudo -S -E bash '{{.Path}}'",
 			"only": ["virtualbox-iso"]
 		},
@@ -126,7 +123,7 @@
 			"ami_description": "Go Front End",
 			"tags": {
 				"version": "{{user `version`}}"
-        }
-    }
+        	}
+		}
 	]
 }
