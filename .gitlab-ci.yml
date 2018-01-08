@@ -27,8 +27,6 @@ build_code:
       - ./gofrontend/ToUpload/app
 #      - ./gofrontend/Scripts/*
 #      - ./gofrontend/ansible/*
-  only:
-    - master
 
 #unit_integration_test_code:
 #  stage: test code
@@ -66,8 +64,8 @@ build_service:
      -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" template.packer
   dependencies:
     - build_code
-  only:
-    - master
+  tags:
+    - iaas
 
 #functional_test_service:
 #  stage: test docker
@@ -147,8 +145,8 @@ deploy_staging:
   environment:
     name: staging
   when: manual
-  only:
-    - master
+  tags:
+    - iaas
 
 #deploy_prod:
 #  stage: deploy
