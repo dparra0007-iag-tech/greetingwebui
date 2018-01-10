@@ -50,6 +50,7 @@ build_service:
   image: dparra0007/packer:20171221-2
   script:
     - cd ./gofrontend
+    - rm -Rf /home/gitlab-runner/VirtualBox\ VMs/
     - packer build
      -var "version=$CI_COMMIT_SHA" 
      -var "access_key=${AWS_CREDENTIAL_ACCESS_KEY_ID}" 
