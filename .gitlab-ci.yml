@@ -11,12 +11,6 @@ stages:
 - test image
 - deploy
 
-#variables:
-#  CONTAINER_SERVICE_IMAGE: dparra0007/todoapi
-#  CONTAINER_MESSAGEBROKER_IMAGE: dparra0007/todoapi-messagebroker
-#  CONTAINER_APIGATEWAY_IMAGE: dparra0007/todoapi-apigateway
-#  CONTAINER_DISCOVERY_IMAGE: dparra0007/todoapi-discovery
-
 build_code:
   stage: build code
   image: golang:1.8
@@ -25,8 +19,6 @@ build_code:
   artifacts:
     paths:
       - ./gofrontend/ToUpload/app
-#      - ./gofrontend/Scripts/*
-#      - ./gofrontend/ansible/*
 
 #unit_integration_test_code:
 #  stage: test code
@@ -147,21 +139,3 @@ deploy_staging:
   when: manual
   tags:
     - iaas
-
-#deploy_prod:
-#  stage: deploy
-#  image: appropriate/curl
-#  script:
-#    - echo "Deploy to production server"
-#    - curl -X POST https://cloud.docker.com/api/app/v1/service/5439504f-7008-4b08-9f55-10932dd9b205/trigger/9e7c6483-cc64-4554-b7ce-5ede1529a374/call/
-#    - curl -X POST https://cloud.docker.com/api/app/v1/service/0770275d-50fe-438d-bc09-21f7d31a40d2/trigger/88d89f02-973e-4e84-8c59-8018d05a795d/call/
-#    - curl -X POST https://cloud.docker.com/api/app/v1/service/7a76e002-dc20-4ba4-8641-d2427167097a/trigger/285b9c3b-53c8-4fbc-bd4a-7a6c00ce4872/call/
-#    - curl -X POST https://cloud.docker.com/api/app/v1/service/3a995e5c-bbd0-4625-b5d7-f07257803276/trigger/2d702465-1a07-4bb6-8212-9ae1e5b67b19/call/
-#  environment:
-#    name: production
-#    url: http://todoapi-apigateway.w53-todoapi.3a995e5c.svc.dockerapp.io:8080/todoapi/swagger.json
-#  when: manual
-#  only:
-#    - master
-#  except:
-#    - triggers
