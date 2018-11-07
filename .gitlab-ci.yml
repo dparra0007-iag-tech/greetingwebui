@@ -1,7 +1,7 @@
-image: dparra0007/docker:451
+image: iaghcp-docker-technical-architecture.jfrog.io/docker:1.0.0
 
 services:
-  - name: dparra0007/docker-dind:421
+  - name: iaghcp-docker-technical-architecture.jfrog.io/docker-dind:1.0.0
     alias: docker
 
 stages:
@@ -13,7 +13,7 @@ stages:
 
 build_code:
   stage: build code
-  image: golang:1.8
+  image: iaghcp-docker-technical-architecture.jfrog.io/golang:1.8
   script:
     - env GOOS=linux GOARCH=amd64 go build -o ./gofrontend/ToUpload/app ./gofrontend/app.go
   artifacts:
@@ -45,9 +45,10 @@ build_code:
 #  except:
 #    - triggers
 
+#packer build -var "version=local-1" -var "access_key=AKIAIX3DNBYFKAC3H4QA" -var "secret_key=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" template.packer
 build_service:
   stage: build image
-  image: dparra0007/packer:20171221-2
+  image: iaghcp-docker-technical-architecture.jfrog.io/packer:1.0.0
   script:
     - cd ./gofrontend
     - rm -Rf /home/gitlab-runner/VirtualBox\ VMs/
@@ -132,7 +133,7 @@ deploy_staging:
     - export AWS_DEFAULT_REGION="us-west-2"
   script:
     - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
-    - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://workspace-gitlab-ci/
+    - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://glp-workspace-gitlab-ci/
     - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_COMMIT_SHA --query 'Images[*].{ID:ImageId}' --output text)"
     - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
   environment:

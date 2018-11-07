@@ -9,7 +9,7 @@
              "s3:FullAccess"
           ],
           "Resource": [
-             "arn:aws:s3:::workspace-gitlab-ci"
+             "arn:aws:s3:::glp-workspace-gitlab-ci"
           ]
        },
        {
@@ -18,7 +18,7 @@
              "s3:GetObject"
           ],
           "Resource": [
-             "arn:aws:s3:::workspace-gitlab-ci/*"
+             "arn:aws:s3:::glp-workspace-gitlab-ci/*"
           ]
        },
        {

@@ -34,7 +34,7 @@
          			"<enter><wait>"
       			],
 			"boot_wait": "10s",
-      			"iso_url": "https://s3-us-west-2.amazonaws.com/workspace-gitlab-ci/ubuntu-14.04.5-server-amd64.iso",
+      			"iso_url": "https://s3-us-west-2.amazonaws.com/glp-workspace-gitlab-ci/ubuntu-14.04.5-server-amd64.iso",
       			"iso_checksum_type": "md5",
       			"iso_checksum": "dd54dc8cfc2a655053d19813c2f9aa9f",
 			"guest_os_type": "Ubuntu_64",
@@ -117,7 +117,7 @@
 			"access_key": "{{user `access_key`}}",
 			"secret_key": "{{user `secret_key`}}",
 			"region": "us-west-2",
-			"s3_bucket_name": "workspace-gitlab-ci",
+			"s3_bucket_name": "glp-workspace-gitlab-ci",
 			"license_type": "BYOL",
 			"ami_name": "FrontEndTier-{{isotime | clean_ami_name}}",
 			"ami_description": "Go Front End",
