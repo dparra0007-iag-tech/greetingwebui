@@ -53,7 +53,7 @@ build_service:
     - cd ./gofrontend
     - rm -Rf /home/gitlab-runner/VirtualBox\ VMs/
     - packer build
-     -var "version=$CI_COMMIT_SHA" 
+     -var "version=$CI_PIPELINE_ID" 
      -var "access_key=${AWS_CREDENTIAL_ACCESS_KEY_ID}" 
      -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" template.packer
   dependencies:
@@ -61,30 +61,26 @@ build_service:
   tags:
     - iaas
 
-#functional_test_service:
-#  stage: test docker
-#  before_script:
-#    - apk update
-#    - apk upgrade
-#    - apk add python python-dev py-pip build-base
-#    - curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-#    - chmod +x /usr/local/bin/docker-compose
-#    - pip install docker-compose
-#  script:
-#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-#    - export TAG=$CI_COMMIT_REF_NAME 
-#    - docker-compose -f docker-compose.functional.test.yml up -d
-#    - sleep 10s
-#    - docker logs $(docker ps -a --filter ancestor=dparra0007/newman:20170712-4 --format "{{.ID}}")
-#  after_script:
-#    - docker stop $(docker ps -a --filter status=running --format "{{.ID}}") > /dev/null
-#    - docker rm $(docker ps -a -q) -f > /dev/null
-#    - docker rmi $(docker images -q) -f > /dev/null || true
-#  when: manual
-#  only:
-#    - master
-#  except:
-#    - triggers
+functional_test_service:
+  stage: test image
+  #image: infrastructureascode/aws-cli:1.14.14
+  image: iaghcp-docker-technical-architecture.jfrog.io/docker-serverless:1.0.0
+  before_script:
+    - export AWS_ACCESS_KEY_ID=${AWS_CREDENTIAL_ACCESS_KEY_ID} 
+    - export AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}
+    - export AWS_DEFAULT_REGION="us-west-2"
+  script:
+    - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
+    - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://glp-workspace-gitlab-ci/
+    - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_PIPELINE_ID --query 'Images[*].{ID:ImageId}' --output text)"
+    - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
+
+    - cd ./gofrontend-functional-test
+    - wget --header="X-Api-Key:${POSTMAN_API_KEY}" -O ./testsuites/test.postman_collection.json https://api.getpostman.com/collections/651996-1113039f-c221-489a-a9aa-a01df5dafc61
+    - npm install
+    - serverless deploy -v
+    - cd ..
+  when: manual
 
 #performance_test_service:
 #  stage: test docker
@@ -134,10 +130,8 @@ deploy_staging:
   script:
     - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
     - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://glp-workspace-gitlab-ci/
-    - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_COMMIT_SHA --query 'Images[*].{ID:ImageId}' --output text)"
+    - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_PIPELINE_ID --query 'Images[*].{ID:ImageId}' --output text)"
     - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
   environment:
     name: staging
   when: manual
-  tags:
-    - iaas
