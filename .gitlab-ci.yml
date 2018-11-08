@@ -74,51 +74,20 @@ functional_test_service:
     - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://glp-workspace-gitlab-ci/
     - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_PIPELINE_ID --query 'Images[*].{ID:ImageId}' --output text)"
     - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
+    
+    - PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-key,Values=aws:cloudformation:stack-name" | jq ".Reservations[0].Instances[0].PublicIpAddress" | tr -d \")"
+    - sed -i -e "s/{{PUBLIC_IP}}/$PUBLIC_IP/g" ./gofrontend-functional-test/config/default.json
 
     - cd ./gofrontend-functional-test
     - wget --header="X-Api-Key:${POSTMAN_API_KEY}" -O ./testsuites/test.postman_collection.json https://api.getpostman.com/collections/651996-1113039f-c221-489a-a9aa-a01df5dafc61
+    - npm install --save https://github.com/dparra0007/newman-reporter-winston/tarball/master
     - npm install
     - serverless deploy -v
+    - serverless invoke -f run-newman-test
     - cd ..
+
+    - aws cloudformation delete-stack --stack-name $CI_PROJECT_NAME
   when: manual
-
-#performance_test_service:
-#  stage: test docker
-#  before_script:
-#    - apk update
-#    - apk upgrade
-#    - apk add python python-dev py-pip build-base
-#    - curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-#    - chmod +x /usr/local/bin/docker-compose
-#    - pip install docker-compose
-#  script:
-#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-#    - export TAG=$CI_COMMIT_REF_NAME 
-#    - docker-compose -f docker-compose.performance.test.yml up -d
-#    - sleep 90s
-#    - docker logs $(docker ps -a --filter ancestor=buildpack-deps:curl --format "{{.ID}}")
-#  after_script:
-#    - docker stop $(docker ps -a --filter status=running --format "{{.ID}}") > /dev/null
-#    - docker rm $(docker ps -a -q) -f > /dev/null
-#    - docker rmi $(docker images -q) -f > /dev/null || true
-#  when: manual
-#  only:
-#    - master
-#  except:
-#    - triggers
-
-#capacity_test_service:
-#  stage: test docker
-#  image: microsoft/aspnetcore-build:1.1
-#  script:
-#    - echo "Deploy to capacity testing env and execute automatic testing"
-#  - /usr/local/bin/oc login ${OC_URL} --token=${OC_TOKEN}
-#  - /usr/local/bin/oc project todoapi || /usr/local/bin/oc new-project todoapi
-#  when: manual
-#  only:
-#    - master
-#  except:
-#    - triggers
 
 deploy_staging:
   stage: deploy

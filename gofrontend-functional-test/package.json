@@ -19,7 +19,7 @@
   "dependencies": {
     "config": "^1.29.0",
     "newman": "^3.9.1",
-    "newman-reporter-winston": "https://github.com/Mgutjahr/newman-reporter-winston/tarball/master",
+    "newman-reporter-winston": "https://github.com/dparra0007/newman-reporter-winston/tarball/master",
     "uuid": "^3.1.0",
     "winston": "^2.4.0"
   }
