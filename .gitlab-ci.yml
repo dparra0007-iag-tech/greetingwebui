@@ -11,6 +11,10 @@ stages:
 - test image
 - deploy
 
+variables:
+  IMAGE_NAME: greentingwebui
+  GITLAB_SERVICE_REGISTRY: registry.gitlab.com/iag-dev/glp/greentingwebui/$IMAGE_NAME
+
 build_code:
   stage: build code
   image: iaghcp-docker-technical-architecture.jfrog.io/golang:1.8
