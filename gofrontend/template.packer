@@ -60,6 +60,11 @@
       			],
 			"headless": "true",
 			"format": "ova"
+		},
+		{
+			"type": "docker",
+			"image": "ubuntu:14.04",
+			"export_path": "middletier.tar"
 		}
 	],
 	"provisioners": [
@@ -93,6 +98,7 @@
 			"type": "shell",
 			"inline": [
 				"echo '**** Configuring application'",
+				"sudo echo exit 0 > /usr/sbin/policy-rc.d",
 				"sudo apt-get install -y supervisor={{user `supervisor_version`}}",
 				"sudo cp /tmp/app-supervisor.conf /etc/supervisor/conf.d",
 				"sudo cp /tmp/app /usr/local/bin/app",
@@ -123,7 +129,8 @@
 			"ami_description": "Go Front End",
 			"tags": {
 				"version": "{{user `version`}}"
-        	}
+        	},
+			"only": ["virtualbox-iso"]
 		}
 	]
 }
