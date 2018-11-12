@@ -7,12 +7,16 @@ services:
 stages:
 - build code
 - test code
-- build image
-- test image
-- deploy
+- build application
+- test application
+- push binaries
+- deploy application
 
 variables:
   IMAGE_NAME: greetingwebui
+  GLP_REGISTRY: iaghcp-docker-glp.jfrog.io
+  CONTAINER_SERVICE_IMAGE: $GLP_REGISTRY/greetingwebui/$IMAGE_NAME
+  BUILD_NAME: $CI_PROJECT_NAME
   GITLAB_SERVICE_REGISTRY: registry.gitlab.com/iag-dev/glp/greetingwebui/$IMAGE_NAME
 
 build_code:
@@ -51,7 +55,7 @@ build_code:
 
 #packer build -var "version=local-1" -var "access_key=AKIAIX3DNBYFKAC3H4QA" -var "secret_key=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" template.packer
 build_service:
-  stage: build image
+  stage: build application
   image: iaghcp-docker-technical-architecture.jfrog.io/packer:1.0.0
   script:
     - cd ./gofrontend
@@ -70,7 +74,7 @@ build_service:
     - iaas
 
 #functional_test_service:
-#  stage: test image
+#  stage: test application
 #  image: iaghcp-docker-technical-architecture.jfrog.io/docker-serverless:1.0.0
 #  before_script:
 #    - export AWS_ACCESS_KEY_ID=${AWS_CREDENTIAL_ACCESS_KEY_ID} 
@@ -96,19 +100,38 @@ build_service:
 #    - aws cloudformation delete-stack --stack-name $CI_PROJECT_NAME
 #  when: manual
 
-#docker run -d -it middletier:latest /bin/bash -c "sudo service supervisor start && sudo service nginx start && bash"
-#deploy_staging:
-#  stage: deploy
-#  image: infrastructureascode/aws-cli:1.14.14
-#  before_script:
-#    - export AWS_ACCESS_KEY_ID=${AWS_CREDENTIAL_ACCESS_KEY_ID} 
-#    - export AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}
-#    - export AWS_DEFAULT_REGION="us-west-2"
-#  script:
-#    - cp ./aws.template ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template
-#    - aws s3 cp ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template s3://glp-workspace-gitlab-ci/
-#    - AMI="$(aws ec2 describe-images --filters Name=tag-key,Values=version Name=tag-value,Values=$CI_PIPELINE_ID --query 'Images[*].{ID:ImageId}' --output text)"
-#    - aws cloudformation deploy --template-file ./aws-$CI_PIPELINE_ID-$CI_JOB_ID.template --stack-name $CI_PROJECT_NAME --parameter-overrides 'InstanceType=t2.micro' 'KeyName=MiddleTier' "AMI=$AMI"
-#  environment:
-#    name: staging
-#  when: manual
+push_service_binaries:
+  stage: push binaries
+  tags:
+    - docker-push
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker pull $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
+    - docker tag $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME $CONTAINER_SERVICE_IMAGE
+    - make push ARTIFACTORY_URL=$ARTIFACTORY_URL ARTIFACTORY_USER=$ARTIFACTORY_USER ARTIFACTORY_PASS=$ARTIFACTORY_PASS CONTAINER_SERVICE_IMAGE=$CONTAINER_SERVICE_IMAGE DOCKER_REPO_KEY=$DOCKER_REPO_KEY BUILD_NAME=$BUILD_NAME CI_PIPELINE_ID=$CI_PIPELINE_ID URL_BA_REGISTRY=$URL_BA_REGISTRY
+
+deploy_staging:
+  stage: deploy application
+  variables:
+    OC_URL: $OC_URL_STG
+    OC_TOKEN: $OC_TOKEN_STG
+    TAG_GLOBALCONF: 'https:\/\/raw.githubusercontent.com\/dparra0007\/W53-STATIC-CONFIG-SETTINGS\/stg\/env.sh'
+    TAG_SYSTEMCONF: 'https:\/\/raw.githubusercontent.com\/dparra0007\/W53-STATIC-CONFIG-SETTINGS\/greetingwebui-stg\/env.sh'
+  before_script:
+    - sed -i -e "s/{{TAG_SERVICE}}/$CI_PIPELINE_ID/g" deployment.yml
+    - sed -i -e "s/{{TAG_DB}}/$CI_PIPELINE_ID/g" deployment.yml
+    - sed -i -e "s/{{TAG_GLOBALCONF}}/$TAG_GLOBALCONF/g" deployment.yml
+    - sed -i -e "s/{{TAG_SYSTEMCONF}}/$TAG_SYSTEMCONF/g" deployment.yml
+    - oc login $OC_URL_STG --token $OC_TOKEN_STG --insecure-skip-tls-verify
+    - oc project ocp01-greetingwebui-stg
+  script:
+    - oc create --filename=deployment.yml
+#    - oc autoscale dc/greetingapi --min 1 --max 3 --cpu-percent=50
+    - oc expose service greetingwebui
+  artifacts:
+    paths:
+      - ./deployment.yml
+  environment:
+    name: staging
+    url: http://greetingwebui-apigateway-ocp01-greetingwebui-stg.apps.ocp01.hcp.iairgroup.com/greetingwebui/
+  when: manual
