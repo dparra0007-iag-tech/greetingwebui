@@ -12,8 +12,8 @@ stages:
 - deploy
 
 variables:
-  IMAGE_NAME: greentigwebui
-  GITLAB_SERVICE_REGISTRY: registry.gitlab.com/iag-dev/glp/greentigwebui/$IMAGE_NAME
+  IMAGE_NAME: greetingwebui
+  GITLAB_SERVICE_REGISTRY: registry.gitlab.com/iag-dev/glp/greetingwebui/$IMAGE_NAME
 
 build_code:
   stage: build code
