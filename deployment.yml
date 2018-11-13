@@ -1,20 +1,6 @@
 apiVersion: v1
 items:
 - apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    creationTimestamp: null
-    labels:
-      io.kompose.service: greetingwebui-config-claim0
-    name: greetingwebui-config-claim0
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: 100Mi
-  status: {}
-- apiVersion: v1
   kind: ImageStream
   metadata:
     creationTimestamp: null
@@ -29,23 +15,6 @@ items:
       generation: null
       importPolicy: {}
       name: "{{TAG_SERVICE}}"
-  status:
-    dockerImageRepository: ""
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    creationTimestamp: null
-    name: static-config
-  spec:
-    tags:
-    - annotations:
-        openshift.io/imported-from: iaghcp-docker-technical-architecture.jfrog.io/static-config:1.0.0
-      from:
-        kind: DockerImage
-        name: iaghcp-docker-technical-architecture.jfrog.io/static-config:1.0.0
-      generation: null
-      importPolicy: {}
-      name: "1.0.0"
   status:
     dockerImageRepository: ""
 - apiVersion: v1
@@ -66,23 +35,6 @@ items:
           deploymentconfig: greetingwebui
       spec:
         containers:
-        - image: iaghcp-docker-technical-architecture.jfrog.io/static-config:1.0.0
-          name: static-config
-          resources:
-            requests:
-              cpu: 100m
-              memory: 200Mi
-            limits:
-              cpu: "2"
-              memory: "2Gi"
-          env:
-          - name: GLOBALCONF
-            value: {{TAG_GLOBALCONF}}
-          - name: SYSTEMCONF
-            value: {{TAG_SYSTEMCONF}}
-          volumeMounts:
-          - mountPath: /usr/src/app/conf
-            name: greetingwebui-config-claim0
         - image: iaghcp-docker-glp.jfrog.io/greetingwebui/greetingwebui:{{TAG_SERVICE}}
           command: [ "/bin/bash"]
           args: ["-c", "sudo service supervisor start && sudo service nginx start && bash"]
@@ -96,15 +48,6 @@ items:
               memory: "2Gi"
           ports:
           - containerPort: 8080
-          volumeMounts:
-          - mountPath: /home
-            name: greetingwebui-config-claim0
-          securityContext:
-            privileged: true
-        volumes:
-        - name: greetingwebui-config-claim0
-          persistentVolumeClaim:
-            claimName: greetingwebui-config-claim0
     test: false
     triggers:
     - type: ConfigChange
