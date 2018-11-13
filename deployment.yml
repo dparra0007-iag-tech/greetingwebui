@@ -97,8 +97,10 @@ items:
           ports:
           - containerPort: 8080
           volumeMounts:
-          - mountPath: /tmp
+          - mountPath: /home
             name: greetingwebui-config-claim0
+          securityContext:
+            privileged: true
         volumes:
         - name: greetingwebui-config-claim0
           persistentVolumeClaim:
