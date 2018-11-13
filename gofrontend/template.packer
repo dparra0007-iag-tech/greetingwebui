@@ -64,7 +64,10 @@
 		{
 			"type": "docker",
 			"image": "ubuntu:14.04",
-			"export_path": "middletier.tar"
+			"commit": true,
+			"changes": [
+				"USER 1001"
+			]
 		}
 	],
 	"provisioners": [
@@ -105,6 +108,15 @@
 				"sudo supervisorctl reread",
 				"sudo supervisorctl update"
 			]
+		},
+		{
+			"type": "shell",
+			"inline": [
+				"echo '**** Configuring non-root user'",
+				"sudo mkdir -p /usr/local/conf",
+				"sudo useradd -u 1001 -r -g 0 -d /usr/local/conf -s /sbin/nologin -c 'Default Application User' default",
+				"sudo chown -R 1001:0 /usr/local/conf && chmod -R og+rwx /usr/local/conf"
+			]
 		}
 	],
 	"post-processors": [
@@ -131,6 +143,14 @@
 				"version": "{{user `version`}}"
         	},
 			"only": ["virtualbox-iso"]
-		}
+		},
+		[
+			{
+				"type": "docker-tag",
+				"repository": "{{user `image_name`}}",
+				"tag": "{{user `image_tag`}}",
+				"only": ["docker"]
+			}
+		]
 	]
 }

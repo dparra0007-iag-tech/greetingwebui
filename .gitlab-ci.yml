@@ -59,15 +59,18 @@ build_service:
   stage: build application
   image: iaghcp-docker-technical-architecture.jfrog.io/packer:1.0.0
   script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
     - cd ./gofrontend
     - rm -Rf /home/gitlab-runner/VirtualBox\ VMs/
     - packer build -only="docker"
      -var "version=$CI_PIPELINE_ID" 
      -var "access_key=${AWS_CREDENTIAL_ACCESS_KEY_ID}" 
-     -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" template.packer
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - cat middletier.tar | docker import - $GITLAB_SERVICE_REGISTRY
-    - docker tag $GITLAB_SERVICE_REGISTRY $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
+     -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" 
+     -var "image_name=$GITLAB_SERVICE_REGISTRY" 
+     -var="image_tag=$CI_COMMIT_REF_NAME" template.packer
+    #- docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    #- cat middletier.tar | docker import - $GITLAB_SERVICE_REGISTRY
+    #- docker tag $GITLAB_SERVICE_REGISTRY $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
     - docker push $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
   dependencies:
     - build_code
