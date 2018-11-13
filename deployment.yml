@@ -37,7 +37,7 @@ items:
         containers:
         - image: iaghcp-docker-glp.jfrog.io/greetingwebui/greetingwebui:{{TAG_SERVICE}}
           command: [ "/bin/bash"]
-          args: ["-c", "sudo service supervisor start && sudo service nginx start && bash"]
+          args: ["-c", "service supervisor start && service nginx start && bash"]
           name: greetingwebui
           resources:
             requests:
