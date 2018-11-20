@@ -19,7 +19,6 @@ variables:
   CONTAINER_SERVICE_IMAGE: $GLP_REGISTRY/greetingwebui/$IMAGE_NAME
   BUILD_NAME: $CI_PROJECT_NAME
   GITLAB_SERVICE_REGISTRY: registry.gitlab.com/iag-dev/glp/greetingwebui/$IMAGE_NAME
-  DOCKER_DRIVER: overlay
 
 build_code:
   stage: build code
@@ -104,6 +103,8 @@ build_service:
 
 push_service_binaries:
   stage: push binaries
+  variables:
+    DOCKER_DRIVER: overlay
   tags:
     - docker-push
   script:
