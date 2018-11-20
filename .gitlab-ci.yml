@@ -103,8 +103,6 @@ build_service:
 
 push_service_binaries:
   stage: push binaries
-  variables:
-    DOCKER_DRIVER: overlay
   tags:
     - docker-push
   script:
