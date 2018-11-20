@@ -139,3 +139,31 @@ deploy_staging:
     name: staging
     url: http://greetingwebui-apigateway-ocp01-greetingwebui-stg.apps.ocp01.hcp.iairgroup.com/greetingwebui/
   when: manual
+
+deploy_production:
+  stage: deploy application
+  variables:
+    OC_URL: $OC_URL_PRO
+    OC_TOKEN: $OC_TOKEN_PRO
+    TAG_GLOBALCONF: 'https:\/\/raw.githubusercontent.com\/dparra0007\/W53-STATIC-CONFIG-SETTINGS\/stg\/env.sh'
+    TAG_SYSTEMCONF: 'https:\/\/raw.githubusercontent.com\/dparra0007\/W53-STATIC-CONFIG-SETTINGS\/greetingwebui\/env.sh'
+  before_script:
+    - sed -i -e "s/{{TAG_SERVICE}}/$CI_PIPELINE_ID/g" deployment.yml
+    - sed -i -e "s/{{TAG_DB}}/$CI_PIPELINE_ID/g" deployment.yml
+    - sed -i -e "s/{{TAG_GLOBALCONF}}/$TAG_GLOBALCONF/g" deployment.yml
+    - sed -i -e "s/{{TAG_SYSTEMCONF}}/$TAG_SYSTEMCONF/g" deployment.yml
+    - oc login $OC_URL_STG --token $OC_TOKEN_STG --insecure-skip-tls-verify
+    - oc project greetingwebui
+  script:
+    - oc create --filename=deployment.yml
+#    - oc autoscale dc/greetingapi --min 1 --max 3 --cpu-percent=50
+    - oc expose service greetingwebui
+  artifacts:
+    paths:
+      - ./deployment.yml
+  environment:
+    name: production
+    url: http://greetingapi-w53-greetingapi.dit-iaggs.com/greetingwebui/
+  when: manual
+  except:
+    - triggers
