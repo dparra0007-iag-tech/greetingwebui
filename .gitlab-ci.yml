@@ -68,9 +68,6 @@ build_service:
      -var "secret_key=${AWS_CREDENTIAL_SECRET_ACCESS_KEY}" 
      -var "image_name=$GITLAB_SERVICE_REGISTRY" 
      -var="image_tag=$CI_COMMIT_REF_NAME" template.packer
-    #- docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    #- cat middletier.tar | docker import - $GITLAB_SERVICE_REGISTRY
-    #- docker tag $GITLAB_SERVICE_REGISTRY $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
     - docker push $GITLAB_SERVICE_REGISTRY:$CI_COMMIT_REF_NAME
   dependencies:
     - build_code
