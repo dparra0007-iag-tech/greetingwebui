@@ -152,7 +152,7 @@ deploy_production:
     - sed -i -e "s/{{TAG_DB}}/$CI_PIPELINE_ID/g" deployment.yml
     - sed -i -e "s/{{TAG_GLOBALCONF}}/$TAG_GLOBALCONF/g" deployment.yml
     - sed -i -e "s/{{TAG_SYSTEMCONF}}/$TAG_SYSTEMCONF/g" deployment.yml
-    - oc login $OC_URL_STG --token $OC_TOKEN_STG --insecure-skip-tls-verify
+    - oc login $OC_URL_PRO --token $OC_TOKEN_PRO --insecure-skip-tls-verify
     - oc project greetingwebui
   script:
     - oc create --filename=deployment.yml
