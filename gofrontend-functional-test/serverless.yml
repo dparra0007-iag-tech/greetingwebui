@@ -2,7 +2,7 @@ service: serverless-newman
 
 provider:
   name: aws
-  region: us-east-2
+  region: us-west-2
   stage: dev
   runtime: nodejs6.10
 
